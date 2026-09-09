@@ -1,2 +1,35 @@
 # cloud1
 automated deployment of wordpress, mysql and caddy on a remote server using ansible
+
+
+## Steps for ansible
+
+- update system
+- install utilites
+- Install Docker GPG key
+- Add docker APT repo
+- Install docker and compose
+- Start docker service and on boot
+- 
+
+## Useful commands
+
+Check ports of host `nmap -Pn -p 22,80,443,3306,8080 YOUR.IP`
+Check Docker service `systemctl status docker`
+check running services `systemctl --type=service --state=running`
+
+create random base 16 pw `openssl rand -hex 16`
+
+
+
+## Ansible 
+checking connection `ansible -i ansible/inventory.ini cloud1 -m ping`
+
+create vault `ansible-vault create vault.yml`
+view vault `ansible-vault view vault.yml`
+edit vault `ansible-vault edit vault.yml`
+
+
+## Obtaining TLS cert
+
+

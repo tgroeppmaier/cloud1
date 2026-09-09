@@ -1,0 +1,59 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: "{{ db_name }}"
+      MARIADB_USER: "{{ db_user }}"
+      MARIADB_PASSWORD: "{{ vault_db_password }}"
+      MARIADB_ROOT_PASSWORD: "{{ vault_db_root_password }}"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  wordpress:
+    image: wordpress:php8.3-fpm
+    container_name: wordpress
+    restart: unless-stopped
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: "{{ db_name }}"
+      WORDPRESS_DB_USER: "{{ db_user }}"
+      WORDPRESS_DB_PASSWORD: "{{ vault_db_password }}"
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      - mariadb
+
+  phpmyadmin:
+    image: phpmyadmin:5-apache
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_ABSOLUTE_URI: "https://{{ domain_name }}/phpmyadmin/"
+    depends_on:
+      - mariadb
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - wordpress_data:/var/www/html:ro
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - wordpress
+      - phpmyadmin
+
+volumes:
+  mariadb_data:
+  wordpress_data:
+  caddy_data:
+  caddy_config:

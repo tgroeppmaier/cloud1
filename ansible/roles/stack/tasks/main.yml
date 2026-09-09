@@ -1,0 +1,36 @@
+- name: Create folder for Docker files
+  ansible.builtin.file:
+    path: /opt/cloud1
+    state: directory
+    mode: "0755"
+
+- name: Create Caddy directory
+  ansible.builtin.file:
+    path: /opt/cloud1/caddy
+    state: directory
+    mode: "0755"
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: /opt/cloud1/docker-compose.yml
+    mode: "0600"
+
+- name: Deploy Caddyfile
+  ansible.builtin.template:
+    src: Caddyfile.j2
+    dest: /opt/cloud1/caddy/Caddyfile
+    mode: "0644"
+
+- name: Start Docker Compose stack
+  ansible.builtin.command:
+    cmd: docker compose up -d --remove-orphans
+    chdir: /opt/cloud1
+  register: compose_output
+  changed_when: >
+    'Created' in compose_output.stdout or
+    'Recreated' in compose_output.stdout or
+    'Started' in compose_output.stdout or
+    'Created' in compose_output.stderr or
+    'Recreated' in compose_output.stderr or
+    'Started' in compose_output.stderr

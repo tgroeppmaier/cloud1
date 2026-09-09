@@ -1,0 +1,16 @@
+{{ domain_name }} {
+
+    encode zstd gzip
+
+    redir /phpmyadmin /phpmyadmin/
+
+    handle_path /phpmyadmin/* {
+        reverse_proxy phpmyadmin:80
+    }
+
+    root * /var/www/html
+
+    php_fastcgi wordpress:9000
+
+    file_server
+}
