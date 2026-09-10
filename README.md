@@ -15,7 +15,9 @@ automated deployment of wordpress, mysql and caddy on a remote server using ansi
 ## Useful commands
 
 Check ports of host `nmap -Pn -p 22,80,443,3306,8080 YOUR.IP`
+
 Check Docker service `systemctl status docker`
+
 check running services `systemctl --type=service --state=running`
 
 create random base 16 pw `openssl rand -hex 16`
@@ -24,12 +26,12 @@ create random base 16 pw `openssl rand -hex 16`
 
 ## Ansible 
 checking connection `ansible -i ansible/inventory.ini cloud1 -m ping`
+run playbook with vault pw `ansible-playbook -i inventory.ini site.yml --ask-vault-pass`
 
 create vault `ansible-vault create vault.yml`
 view vault `ansible-vault view vault.yml`
 edit vault `ansible-vault edit vault.yml`
 
 
-## Obtaining TLS cert
 
 
