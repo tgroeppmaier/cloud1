@@ -10,6 +10,17 @@ services:
       MARIADB_ROOT_PASSWORD: "{{ vault_db_root_password }}"
     volumes:
       - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   wordpress:
     image: wordpress:php8.3-fpm
@@ -23,7 +34,8 @@ services:
     volumes:
       - wordpress_data:/var/www/html
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
 
   phpmyadmin:
     image: phpmyadmin:5-apache
@@ -51,6 +63,21 @@ services:
     depends_on:
       - wordpress
       - phpmyadmin
+
+  wpcli:
+    image: wordpress:cli
+    profiles:
+      - tools
+    environment:
+      WORDPRESS_DB_HOST: mariadb:3306
+      WORDPRESS_DB_NAME: "{{ db_name }}"
+      WORDPRESS_DB_USER: "{{ db_user }}"
+      WORDPRESS_DB_PASSWORD: "{{ vault_db_password }}"
+    volumes:
+      - wordpress_data:/var/www/html
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
 volumes:
   mariadb_data:

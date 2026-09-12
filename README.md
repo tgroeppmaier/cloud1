@@ -22,9 +22,20 @@ check running services `systemctl --type=service --state=running`
 
 create random base 16 pw `openssl rand -hex 16`
 
+remove key from known hosts `ssh-keygen -R YOUR_VPS_IP`
+
+add remote key to known hosts `ssh-keyscan -H YOUR_VPS_IP >> ~/.ssh/known_hosts`
 
 
 ## Ansible 
+
+Use Ansible from python virtual environment
+`cd cloud1/ansible
+python3 -m venv .venv
+source .venv/bin/activate
+pip install ansible
+ansible-galaxy collection install community.docker`
+
 checking connection `ansible -i ansible/inventory.ini cloud1 -m ping`
 run playbook with vault pw `ansible-playbook -i inventory.ini site.yml --ask-vault-pass`
 

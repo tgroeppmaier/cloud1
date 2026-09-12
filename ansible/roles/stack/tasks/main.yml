@@ -22,15 +22,39 @@
     dest: /opt/cloud1/caddy/Caddyfile
     mode: "0644"
 
-- name: Start Docker Compose stack
+- name: Start Cloud-1 Docker Compose stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/cloud1
+    state: present
+    remove_orphans: true
+
+- name: Check whether WordPress is installed
   ansible.builtin.command:
-    cmd: docker compose up -d --remove-orphans
+    cmd: >
+      docker compose run --rm wpcli
+      wp core is-installed
     chdir: /opt/cloud1
-  register: compose_output
-  changed_when: >
-    'Created' in compose_output.stdout or
-    'Recreated' in compose_output.stdout or
-    'Started' in compose_output.stdout or
-    'Created' in compose_output.stderr or
-    'Recreated' in compose_output.stderr or
-    'Started' in compose_output.stderr
+  register: wordpress_installed
+  changed_when: false
+  failed_when: wordpress_installed.rc not in [0, 1]
+
+- name: Install WordPress
+  ansible.builtin.command:
+    argv:
+      - docker
+      - compose
+      - run
+      - --rm
+      - wpcli
+      - wp
+      - core
+      - install
+      - "--url=https://{{ domain_name }}"
+      - "--title={{ wordpress_title }}"
+      - "--admin_user={{ wordpress_admin_user }}"
+      - "--admin_password={{ vault_wordpress_admin_password }}"
+      - "--admin_email={{ wordpress_admin_email }}"
+      - --skip-email
+    chdir: /opt/cloud1
+  when: wordpress_installed.rc == 1
+  no_log: true
