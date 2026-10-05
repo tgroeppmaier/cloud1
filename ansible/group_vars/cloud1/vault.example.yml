@@ -1,0 +1,17 @@
+# Template for group_vars/cloud1/vault.yml (this file is NOT loaded by Ansible).
+#
+# Create your own vault only if group_vars/cloud1/vault.yml does not exist yet:
+#   cp vault.yml.example vault.yml
+#   (replace every CHANGE_ME with a real value, e.g. from: openssl rand -hex 16)
+#   ansible-vault encrypt vault.yml
+#
+# Never commit vault.yml unencrypted.
+
+# WordPress database user
+vault_db_password: "CHANGE_ME"
+
+# MariaDB root user
+vault_db_root_password: "CHANGE_ME"
+
+# WordPress admin account
+vault_wordpress_admin_password: "CHANGE_ME"

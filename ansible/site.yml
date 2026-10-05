@@ -2,9 +2,10 @@
   hosts: cloud1
   become: true
 
-  vars_files:
-    - group_vars/cloud1/vault.yml
-    - group_vars/cloud1/cloud1.yml
+# auto loading
+  # vars_files:
+  #   - group_vars/cloud1/vault.yml
+  #   - group_vars/cloud1/cloud1.yml
      
   roles:
     - common

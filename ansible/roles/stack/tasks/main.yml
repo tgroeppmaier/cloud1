@@ -58,3 +58,4 @@
     chdir: /opt/cloud1
   when: wordpress_installed.rc == 1
   no_log: true
+  
