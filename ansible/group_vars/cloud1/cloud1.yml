@@ -3,4 +3,4 @@ db_user: wordpress
 
 wordpress_title: "Cloud1"
 wordpress_admin_user: admin
-wordpress_admin_email: you@example.com
+wordpress_admin_email: "admin@{{ domain_name }}"

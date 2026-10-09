@@ -9,5 +9,5 @@
   roles:
     - common
     - docker
+    - firewall
     - stack
-    # - firewall

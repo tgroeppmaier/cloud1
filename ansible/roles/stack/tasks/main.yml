@@ -27,6 +27,8 @@
     project_src: /opt/cloud1
     state: present
     remove_orphans: true
+    wait: true
+    wait_timeout: 300
 
 - name: Check whether WordPress is installed
   ansible.builtin.command:
@@ -36,7 +38,9 @@
     chdir: /opt/cloud1
   register: wordpress_installed
   changed_when: false
-  failed_when: wordpress_installed.rc not in [0, 1]
+  # rc 1 with no error output means "not installed"; an error message
+  # (missing wp-config.php, DB connection failure) is a real failure.
+  failed_when: wordpress_installed.rc not in [0, 1] or 'Error' in wordpress_installed.stderr
 
 - name: Install WordPress
   ansible.builtin.command:
@@ -57,4 +61,5 @@
       - --skip-email
     chdir: /opt/cloud1
   when: wordpress_installed.rc == 1
+  changed_when: true
   no_log: true

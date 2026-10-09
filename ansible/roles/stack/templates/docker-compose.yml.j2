@@ -33,6 +33,18 @@ services:
       WORDPRESS_DB_PASSWORD: "{{ vault_db_password }}"
     volumes:
       - wordpress_data:/var/www/html
+    healthcheck:
+      # wp-config.php is written by the image entrypoint just before php-fpm
+      # starts, so this is healthy only once the volume is ready for wp-cli.
+      test:
+        [
+          "CMD-SHELL",
+          "test -f /var/www/html/wp-config.php && bash -c 'exec 3<>/dev/tcp/127.0.0.1/9000'"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
     depends_on:
       mariadb:
         condition: service_healthy
@@ -61,8 +73,10 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     depends_on:
-      - wordpress
-      - phpmyadmin
+      wordpress:
+        condition: service_healthy
+      phpmyadmin:
+        condition: service_started
 
   wpcli:
     image: wordpress:cli
@@ -77,6 +91,8 @@ services:
       - wordpress_data:/var/www/html
     depends_on:
       mariadb:
+        condition: service_healthy
+      wordpress:
         condition: service_healthy
 
 volumes:

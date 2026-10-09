@@ -22,7 +22,7 @@
 - name: Get Debian architecture
   ansible.builtin.command:
     cmd: dpkg --print-architecture
-  register: dpkg_architecture
+  register: docker_architecture
   changed_when: false
 
 - name: Add Docker APT repository
@@ -37,23 +37,18 @@
     components:
       - stable
     architectures:
-      - "{{ dpkg_architecture.stdout }}"
+      - "{{ docker_architecture.stdout }}"
     signed_by: /etc/apt/keyrings/docker.asc
     state: present
-  register: docker_repo
-
-- name: Update APT cache after adding Docker repository
-  ansible.builtin.apt:
-    update_cache: true
-  when: docker_repo.changed
 
 - name: Install Docker and Compose
   ansible.builtin.apt:
+    update_cache: true
     name:
-      - docker-ce 
-      - docker-ce-cli 
-      - containerd.io 
-      - docker-buildx-plugin 
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
       - docker-compose-plugin
     state: present
 
